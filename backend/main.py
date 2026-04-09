@@ -1,23 +1,50 @@
 from fastapi import FastAPI
 from backend.youtube_api import (
-    returnChannelId,
-    returnVideoId,
-    returnCommentList,
+    return_channel_id,
+    return_videos,
+    return_comment_list,
 )
 from backend.nlp_sentiment import return_sentiment_data
 
-
 app = FastAPI()
 
+
+@app.get("/channel")
+def get_channel(channel: str):
+    channel_id = return_channel_id(channel)
+    
+    return {
+        "channel_name": channel,
+        "channel_id": channel_id
+    }
+
+
+@app.get("/videos")
+def get_videos(channel_id: str):
+    videos = return_videos(channel_id)
+
+    return {
+        "channel_id": channel_id,
+        "videos": videos
+    }
+
+
+@app.get("/comments")
+def get_comments(video_id: str):
+    comment_list = return_comment_list(video_id)
+    
+    return {
+        "video_id": video_id,
+        "comments": comment_list
+    }
+
+
 @app.get("/analyze")
-def analyze(channel: str):
-    channel_id = returnChannelId(channel)
-    video_id = returnVideoId(channel_id)
-    comments = returnCommentList(video_id)
+def analyze(video_id: str):
+    comments = return_comment_list(video_id)
     scores, avg, pos, neg, neu = return_sentiment_data(comments)
 
     return {
-        "channel": channel,
         "video_id": video_id,
         "average_sentiment": avg,
         "positive": pos,
