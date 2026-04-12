@@ -50,13 +50,17 @@ def return_videos(channel_id: str) -> list[dict]:
         secs = int(match.group(3)) if match.group(3) else 0
 
         total_secs = hours * 3600 + mins * 60 + secs
-
-        if total_secs >= 120:
-            videos.append({
+        videos.append({
                 "id": item["id"],
                 "title": item["snippet"]["title"],
                 "duration_seconds": total_secs
             })
+        # if total_secs >= 120:
+        #     videos.append({
+        #         "id": item["id"],
+        #         "title": item["snippet"]["title"],
+        #         "duration_seconds": total_secs
+        #     })
 
     return videos
 

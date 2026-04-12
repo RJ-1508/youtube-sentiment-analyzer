@@ -5,9 +5,18 @@ from backend.youtube_api import (
     return_comment_list,
 )
 from backend.nlp_sentiment import return_sentiment_data
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/channel")
 def get_channel(channel: str):
