@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from backend.youtube_api import (
     return_channel_id,
+    return_channel_stats,
     return_videos,
     return_comment_list,
+    CommentsDisabledError,
+    NoCommentsError,
 )
 from backend.nlp_sentiment import return_sentiment_data
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,10 +24,12 @@ app.add_middleware(
 @app.get("/channel")
 def get_channel(channel: str):
     channel_id = return_channel_id(channel)
-    
+    stats = return_channel_stats(channel_id)
+
     return {
         "channel_name": channel,
-        "channel_id": channel_id
+        "channel_id": channel_id,
+        "stats": stats
     }
 
 
@@ -50,7 +55,21 @@ def get_comments(video_id: str):
 
 @app.get("/analyze")
 def analyze(video_id: str):
-    comments = return_comment_list(video_id)
+    try:
+        comments = return_comment_list(video_id)
+    except CommentsDisabledError:
+        return {
+            "video_id": video_id,
+            "error": "comments_disabled",
+            "message": "Comments are disabled for this video."
+        }
+    except NoCommentsError:
+        return {
+            "video_id": video_id,
+            "error": "no_comments",
+            "message": "This video has no comments."
+        }
+
     scores, avg, pos, neg, neu = return_sentiment_data(comments)
 
     return {
