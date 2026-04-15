@@ -79,3 +79,23 @@ def analyze(video_id: str):
         "negative": neg,
         "neutral": neu
     }
+
+@app.get("/analyze_all")
+def analyze_all(channel_id: str):
+    videos = return_videos(channel_id)
+    results = []
+    for video in videos:
+        try:
+            comments = return_comment_list(video["id"])
+            _, avg, pos, neg, neu = return_sentiment_data(comments)
+            results.append({
+                "video_id": video["id"],
+                "title": video["title"],
+                "average_sentiment": avg,
+                "positive": pos,
+                "negative": neg,
+                "neutral": neu,
+            })
+        except (CommentsDisabledError, NoCommentsError):
+            continue
+    return {"channel_id": channel_id, "results":results}
