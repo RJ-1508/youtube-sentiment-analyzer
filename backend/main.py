@@ -1,9 +1,11 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from backend.youtube_api import (
     return_channel_id,
     return_channel_stats,
     return_videos,
     return_comment_list,
+    ChannelNotFoundError,
     CommentsDisabledError,
     NoCommentsError,
 )
@@ -23,9 +25,14 @@ app.add_middleware(
 
 @app.get("/channel")
 def get_channel(channel: str):
-    channel_id = return_channel_id(channel)
+    try:
+        channel_id = return_channel_id(channel)
+    except ChannelNotFoundError:
+        return JSONResponse(
+            status_code=404,
+            content={"error": "not_found", "message": "Channel not found."}
+        )
     stats = return_channel_stats(channel_id)
-
     return {
         "channel_name": channel,
         "channel_id": channel_id,
@@ -34,8 +41,8 @@ def get_channel(channel: str):
 
 
 @app.get("/videos")
-def get_videos(channel_id: str):
-    videos = return_videos(channel_id)
+def get_videos(channel_id: str, kind: str = "both"):
+    videos = return_videos(channel_id, kind)
 
     return {
         "channel_id": channel_id,
