@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from backend.youtube_api import (
+from youtube_api import (
     return_channel_id,
     return_channel_stats,
     return_videos,
@@ -9,7 +9,7 @@ from backend.youtube_api import (
     CommentsDisabledError,
     NoCommentsError,
 )
-from backend.nlp_sentiment import return_sentiment_data
+from nlp_sentiment import return_sentiment_data
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -17,7 +17,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
